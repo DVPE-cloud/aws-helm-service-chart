@@ -242,3 +242,14 @@ spec:
             - containerPort: {{ .Values.deployment.spec.connection.http.port }}
               name: http
               protocol: TCP
+          volumeMounts:
+            {{- if .Values.additionalparameters.yamlConfigFileApplied }}
+            - name: yaml-config-volume
+              mountPath: /etc/config
+            {{- end}}
+      volumes:
+        {{- if .Values.additionalparameters.yamlConfigFileApplied }}
+        - name: yaml-config-volume
+          configMap:
+            name: {{ $serviceName }}-additional-config-yaml
+        {{ end }}

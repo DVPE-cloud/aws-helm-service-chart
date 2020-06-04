@@ -175,7 +175,13 @@ datadog:
 additionalparameters:
   configMapApplied: false
   secretsApplied: false
+  yamlConfigFileApplied: false
   config:
     PLACEHOLDER: "placeholder"
   secrets:
     PLACEHOLDER: "placeholder"
+  yamlConfigFile:
+    configFileProp: 
+      sub:
+        value
+    anotherConfigFileProp: 1

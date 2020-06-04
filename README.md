@@ -124,12 +124,17 @@ See the [configuration](#Configuration) section for a detailed overview of param
 
 ### Define additional parameters for deployed services
 
-Sometimes the deployed service needs some extra parameters or secrets to run. In such cases an additional ConfigMap or Secret will be created to pass the necessary values to the container as environmental variables. To do that you can include a supplementary values.yaml file in your own project and format it like in the code snippet below:
+Sometimes the deployed service needs some extra parameters or secrets to run. In such cases an additional ConfigMap or Secret will be created to pass the necessary values to the container as environmental variables. 
+
+If you want to pass a YAML configuration file, set `yamlConfigFileApplied` to `true` and pass it under `yamlConfigFile`. Your file will be mounted as a `ConfigMap` volume under `/etc/config/config.yaml` and you can feed it into your application.
+
+To do that you can include a supplementary values.yaml file in your own project and format it like in the code snippet below:
 
 ```
 additionalparameters:
   configMapApplied: true # flag to tell a configmap is defined
   secretsMapApplied: true # flag to tell secrets are defined
+  yamlConfigFileApplied: true # flag to tell yaml config file is defined
   config:
     <PARAM_NAME>: <PARAM_VALUE>
     <PARAM_NAME2>: <PARAM_VALUE2>
@@ -137,6 +142,11 @@ additionalparameters:
   secret:
     <SECRET_NAME>: <SECRET_VALUE>
     ...
+  yamlConfigFile:
+    <ROOT_YAML_PROP1>: 
+        ...
+    <ROOT_YAML_PROP2>: 
+        ...
 ```
 
 You can then call the chart by passing the additional values.yaml as command line argument:
