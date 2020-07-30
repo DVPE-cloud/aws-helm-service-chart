@@ -7,23 +7,19 @@
 oauth2:
   enabled: false
   sidecar:
-    image: 
+    image:
       repository: "localhost:5000"
       name: "auth-sidecar"
       tag: "latest"
       pullPolicy: "Always"
     servicePort: 8443
   secret:
-    # Client ID
-    OIDC_CLIENT_ID: ""
-    # Session Secret 
-    SESSION_SECRET: "!!Ex8mpl3-Rand0m-Secret-Dont-Use-In-Production!!"
-    # Authentication Password for redis
-    SESSION_STORAGE_PASSWORD: "!!Secure-Redis-Password!!"
+    # All necessary sidecar credentials as one object
+    SIDECAR_CREDENTIALS_KEY:
   config:
     # Auto Config URL for OIDC Provider
     OIDC_DISCOVERY_URL: ""
-    # Redirect URL 
+    # Redirect URL
     OIDC_REDIRECT_URI: "https://127.0.0.1:8443/callback"
     # OAuth Scopes
     OIDC_SCOPE: "openid"
@@ -140,6 +136,9 @@ secret:
     aws_accesskey:
     aws_secretkey:
 
+externalSecret:
+  SERVICE_CREDENTIALS_KEY:
+
 #-------------------------------------#
 # tls.yaml/ingress.yaml value section #
 #-------------------------------------#
@@ -156,9 +155,7 @@ tls:
     int:
       secret:
         name: internal-wildcard-tls-secret
-        crt:
-        key:
-
+        value: tls.cert.int.secret
 
 #-------------------------------------#
 # DataDog value section #
@@ -181,7 +178,7 @@ additionalparameters:
   secrets:
     PLACEHOLDER: "placeholder"
   yamlConfigFile:
-    configFileProp: 
+    configFileProp:
       sub:
         value
     anotherConfigFileProp: 1

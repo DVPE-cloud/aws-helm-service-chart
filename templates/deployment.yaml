@@ -37,6 +37,9 @@ spec:
         - name: {{ $serviceName }}-auth-sidecar
           image: "{{ .Values.oauth2.sidecar.image.repository }}/{{ .Values.oauth2.sidecar.image.name }}:{{ .Values.oauth2.sidecar.image.tag }}"
           imagePullPolicy: {{ .Values.oauth2.sidecar.image.pullPolicy }}
+          envFrom:
+          - secretRef:
+              name: {{ $serviceName }}-auth-sidecar
           env:
             - name: "OIDC_DISCOVERY_URL"
               valueFrom:
@@ -55,12 +58,6 @@ spec:
                 configMapKeyRef:
                   name: {{ $serviceName }}-auth-sidecar
                   key: OIDC_SCOPE
-
-            - name: "OIDC_CLIENT_ID"
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $serviceName }}-auth-sidecar
-                  key: OIDC_CLIENT_ID
 
             - name: "OIDC_TOKEN_ENDPOINT_AUTH_METHOD"
               valueFrom:
@@ -128,23 +125,11 @@ spec:
                   name: {{ $serviceName }}-auth-sidecar
                   key: SESSION_STORAGE_PORT
 
-            - name: "SESSION_STORAGE_PASSWORD"
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $serviceName }}-auth-sidecar
-                  key: SESSION_STORAGE_PASSWORD
-
             - name: "SESSION_STORAGE_CACHE_TTL"
               valueFrom:
                 configMapKeyRef:
                   name: {{ $serviceName }}-auth-sidecar
                   key: SESSION_STORAGE_CACHE_TTL
-
-            - name: "SESSION_SECRET"
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $serviceName }}-auth-sidecar
-                  key: SESSION_SECRET
 
             {{- if .Values.datadog.enabled }}
             - name: "ENABLE_DATADOG"
@@ -221,6 +206,9 @@ spec:
                   key: {{$key}}
             {{- end}}
             {{- end}}
+          envFrom:
+            - secretRef:
+                name: {{ $serviceName }}-service-secrets
           readinessProbe:
             httpGet:
               path: {{ .Values.deployment.spec.containers.readinessProbe.httpGet.path }}

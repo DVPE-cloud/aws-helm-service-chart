@@ -12,6 +12,7 @@ exposed as docker container.
 5. There needs to be a DNS Record Set defined with a wildcard DNS name aliasing the ingress's Load Balancer name.
 6. K8S Cert Manager needs to be installed on the cluster
 7. You can access your cluster with `kubectl`
+8. [External Secrets](https://github.com/godaddy/kubernetes-external-secrets) needs to be installed on the cluster
 
 ## Deployed artifacts
 The following components will be deployed with the service.
@@ -34,7 +35,8 @@ helm install my-release <HELM_CHART_REPO_REF>\
     --namespace=<NAMESPACE> \
     --set=deployment.spec.image.repository=<DOCKER_REPOSITORY_URL> \
     --set=deployment.spec.serviceAccountName=<SERVICE_ACCOUNT_NAME> \
-    --set=deployment.spec.containers.readinessProbe.httpGet.path=<READINESS_ENDPOINT_URL>
+    --set=deployment.spec.containers.readinessProbe.httpGet.path=<READINESS_ENDPOINT_URL> \
+    --set=externalSecret.SERVICE_CREDENTIALS_KEY=<SERVICE_CREDENTIALS_KEY>
 ```
 
 ### Include internal/external Ingress
@@ -47,11 +49,10 @@ then append the following parameters to enable their usage:
     --set=ingress.ext.host=<INGRESS_EXT_HOST> \
     --set=ingress.int.enabled=true \
     --set=ingress.int.host=<INGRESS_INT_HOST> \
-    --set=tls.cert.int.secret.crt=<INGRESS_INT_CRT> \
-    --set=tls.cert.int.secret.key=<INGRESS_INT_KEY>
+    --set=tls.cert.int.secret.value=<INGRESS_INT_SECRETS> 
 ```
 
-Note that `tls.cert.int.secret.crt` and `tls.cert.int.secret.key` which will be stored as Kubernetes Secrets need to be already base64 encrypted at this point.
+Note that the Certificate and Key in the AWS Secret Manager Object (`<INGRESS_INT_SECRETS>`) need to be stored base64 encrypted.
 
 ### Include Oauth2 Authentication
 
@@ -59,7 +60,7 @@ If you want to add oauth2 as sidecar in front of your service, append the follow
 
 ```bash
     --set=oauth2.enabled=true \
-    --set=oauth2.secret.OIDC_CLIENT_ID=<OIDC_CLIENT_ID> \
+    --set=oauth2.secret.SIDECAR_CREDENTIALS_KEY=<SIDECAR_CREDENTIALS_KEY> \
     --set=oauth2.config.OIDC_DISCOVERY_URL=<OIDC_DISCOVERY_URL> \
     --set=oauth2.config.OIDC_REDIRECT_URI=<OIDC_REDIRECT_URI> \
     --set=oauth2.config.OIDC_SSL_VERIFY=<OIDC_SSL_VERIFY> \
@@ -81,7 +82,6 @@ You also need to configure and enable oauth2 parameters (see Include Oauth2 Auth
     --set=oauth2.cache.SESSION_STORAGE=<SESSION_STORAGE> \
     --set=oauth2.cache.SESSION_STORAGE_HOST=<SESSION_STORAGE_HOST> \
     --set=oauth2.cache.SESSION_STORAGE_PORT=<SESSION_STORAGE_PORT> \
-    --set=oauth2.secret.SESSION_SECRET=<SESSION_SECRET>
 ```
 
 ### Include DataDog Monitoring
@@ -100,10 +100,10 @@ Finally if you like to add DataDog Monitoring for the included service append th
 - `DOCKER_REPOSITORY_URL` = URL of docker registry to pull image from.
 - `INGRESS_EXT_HOST` = DNS name of the service under which the external ingress should expose this service to the public
 - `INGRESS_INT_HOST` = DNS name of the service under which the internal ingress should expose this service to the corporate network
-- `INGRESS_INT_CRT` = Certificate for TLS configuration of internal Ingress Controller
-- `INGRESS_INT_KEY` = Certificate's key for TLS configuration of internal Ingress Controller
+- `INGRESS_INT_SECRETS` = Reference to AWS Secret Manager which include Certificate (`tls.crt`) and Key (`tls.key`) for TLS configuration of internal Ingress Controller
 - `READINESS_ENDPOINT_URL` = The endpoint URL of your service which should be used for the readiness probe, i.e. `/api/v1/status`
-- `OIDC_CLIENT_ID` = Client ID (get from Identity Provider)
+- `SERVICE_CREDENTIALS_KEY` = Reference to AWS Secret Manager with all sensitive data for the service(e.g. database password)
+- `SIDECAR_CREDENTIALS_KEY` = Reference to AWS Secret Manager with all sensitive data for the sidecar (e.g. Client ID, Client Secret, Cache Password, Session Secret)
 - `OIDC_DISCOVERY_URL` = URL from IDP Authentication
 - `OIDC_REDIRECT_URI` = Redirect URL
 - `OIDC_SSL_VERIFY`= Enable or disable SSL Certificate Verification
@@ -115,9 +115,7 @@ Finally if you like to add DataDog Monitoring for the included service append th
 - `SESSION_STORAGE` = Define the cache storage
 - `SESSION_STORAGE_HOST` = Cache System Hostname/IP Address
 - `SESSION_STORAGE_PORT` = Cache System Port Number
-- `SESSION_STORAGE_PASSWORD` = Cache System Authentication Password
 - `SESSION_STORAGE_CACHE_TTL` = Redis Key Expire TTL
-- `SESSION_SECRET` = Session Secret
 
 
 See the [configuration](#Configuration) section for a detailed overview of parameters.
@@ -179,17 +177,17 @@ The chart can be executed with following parameters:
 | ingress.ext.host              | A valid DNS name for exposing an ingress route for public access. `ingress.ext.enabled` must be set to `true`| `my-service.<AWS_REGION>.bmw.cloud` |
 | ingress.int.enabled           | Set to `true` if a private (intranet facing) ingress controller has been configured in your cluster. Default is set to `false` | `false` |
 | ingress.int.host              | A valid DNS name for exposing an ingress route for private access. `ingress.int.enabled` must be set to `true`| `my-service.<AWS_REGION>.cloud.bmw` |
+| tls.cert.int.secret.value     | Reference to AWS Secret Manager which includes a `tls.crt` as cert and a `tls.key` as key. `NOTE`: This is only relevant if your K8S dev namespace is labeled `private`. It must be base64 pre-encrypted. | `tls.cert.int.secret` |
 | project.includeAwsCredentials | If AWS credentials need to be provided for using other AWS services internally set this flag to `true`. When set to `true` then `secret.aws_accesskey` and `secret.aws_secretkey` need to be provided as well. | `true` if AWS credentials should be included, `false` is the default.|
 | secret.aws_accesskey          | It might be necessary to additionally pass the AWS Access Key when using internal AWS services from within your application. Must be base64 pre-encrypted |  AWS Access Key generated for your user  |
 | secret.aws_secretkey          | It might be necessary to additionally pass the AWS Secret Key when using internal AWS services from within your application. Must be base64 pre-encrypted |  AWS Secret Key generated for your user  |
+| externalSecret.SERVICE_CREDENTIALS_KEY | All sensitive data needed by your application should be stored in a AWS Secret Manager Object. Each key should be named like your needed environment variable | `service.permission-checker` |
 | deployment.spec.resources.limits.cpu | Total amount of CPU time that a container can use every 100 ms. See [Managing Compute Resources for Containers](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) for a detailed description on resource usage.| `200m` |
 | deployment.spec.resources.limits.memory | The memory limit for a Pod. See [Managing Compute Resources for Containers](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) for a detailed description on resource usage. | `235M` |
 | deployment.spec.resources.requests.cpu | Fractional amount of CPU allowed for a Pod. See [Managing Compute Resources for Containers](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) for a detailed description on resource usage.| `150m` |
 | deployment.spec.resources.requests.memory | Amount of memory reserved for a Pod. See [Managing Compute Resources for Containers](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) for a detailed description on resource usage. | `200M` |
 | deployment.spec.containers.readinessProbe.httpGet.path | The endpoint URL of your service which should be used for the readiness probe in the K8S cluster| `/api/v1/status` |
 | tls.issuer.spec.acme.email    | A valid e-mail address where letsencrypt may send notifications to regarding certificate requests, renewals, etc.| `your-email@company.com` |
-| tls.cert.int.secret.crt       | When using the internal Ingress Controller it is necessary to provide a Certificate issued by your company. `NOTE`: This is only relevant if your K8S dev namespace is labeled `private`. It must be base64 pre-encrypted. | `LOCAL ISSUED CERTIFICATE` |
-| tls.cert.int.secret.key       | In addition to the Certificate its private key needs to be provided. It must be base64 pre-encrypted.| `CERTIFICATE'S PRIVATE KEY` |
 | autoscaling.minReplicas       | Minimum amount of replicas the HPA is allowed for downscaling. | `2` |
 | autoscaling.maxReplicas       | Maximum amount of replicas the HPA is allowed for upscaling. | `10` |
 | autoscaling.metrics.resource.cpu.targetAverageUtilization | Threshold in percent for CPU usage. Once this value has been reached a new POD will be created. | `80` |
@@ -199,7 +197,7 @@ The chart can be executed with following parameters:
 | oauth2.sidecar.image.tag | Auth Sidecar Container Image Tag | `v1.1.0` |
 | oauth2.sidecar.image.pullPolicy | Kubernetes Image PullPolicy | `Always` |
 | oauth2.sidecar.servicePort | On which port the service runs | `8443` |
-| oauth2.secret.OIDC_CLIENT_ID | Oauth2 Client ID | Example: `jdasdh8e1h1nqdu8q3hrbfahs90uw1rlnbqufva` |
+| oauth2.secret.SIDECAR_CREDENTIALS_KEY | Reference to a AWS Secret Manager Object with all relevant sidecar credentials. Should contain at least ClientId, Client Secret, Session Secret and Cache Auth Password | Example: `service.permission-checker.auth-sidecar` |
 | oauth2.config.OIDC_DISCOVERY_URL | URL from IDP Discovery Service | `https://idp.domain/auth/discovery` |
 | oauth2.config.OIDC_REDIRECT_URI | Callback URL | `https://127.0.0.1:8443/callback` |
 | oauth2.config.OIDC_SCOPE | Oauth2 Scope | `openid` |
@@ -215,8 +213,6 @@ The chart can be executed with following parameters:
 | oauth2.cache.SESSION_STORAGE_HOST | Hostname (FQDN) or IP Address of the session cache server/cluster | `127.0.0.1` |
 | oauth2.cache.SESSION_STORAGE_PORT | Port Number | `6379` |
 | oauth2.cache.SESSION_STORAGE_CACHE_TTL | Redis Expire TTL Value in seconds (default 2h) | `7200` |
-| oauth2.secret.SESSION_STORAGE_PASSWORD | Redis AUTH Password | `SECURE-PASSWORD-FOR-REDIS-AUTH` |
-| oauth2.secret.SESSION_SECRET | Session secret | `11111111aaaaaaaaabbbbbbCCCCCDDDDD` |
 | datadog.enabled | `true` if DataDog annotations should be used, `false` otherwise | `false` |
 | datadog.source.service| The name of the DataDog source the service should be instrumented with. | `java` |
 
