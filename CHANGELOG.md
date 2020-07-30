@@ -45,4 +45,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.9.3]: https://github.com/DVPE-cloud/aws-helm-service-chart/tree/aws-helm-service-chart-1.9.3
 [1.9.4]: https://github.com/DVPE-cloud/aws-helm-service-chart/tree/aws-helm-service-chart-1.9.4
 [1.9.5]: https://github.com/DVPE-cloud/aws-helm-service-chart/tree/aws-helm-service-chart-1.9.5
+[1.9.10]: https://github.com/DVPE-cloud/aws-helm-service-chart/tree/aws-helm-service-chart-1.9.10
 
