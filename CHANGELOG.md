@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Enable [External Secrets](https://github.com/godaddy/kubernetes-external-secrets) to provision secrets from AWS Secrets Manager 
 - Add Changelog.md 
+- Fix ignored ingress annotations
 
 ## [1.9.5] - 2020-06-15
 

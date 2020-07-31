@@ -1,7 +1,7 @@
 # Values for default microservice projects
 
 #----------------#
-# Oauth2 Sidecar #
+# OAuth2 Sidecar #
 #----------------#
 
 oauth2:
@@ -13,41 +13,41 @@ oauth2:
       tag: "latest"
       pullPolicy: "Always"
     servicePort: 8443
-  secret:
-    # All necessary sidecar credentials as one object
-    SIDECAR_CREDENTIALS_KEY:
-  config:
-    # Auto Config URL for OIDC Provider
-    OIDC_DISCOVERY_URL: ""
-    # Redirect URL
-    OIDC_REDIRECT_URI: "https://127.0.0.1:8443/callback"
-    # OAuth Scopes
-    OIDC_SCOPE: "openid"
-    # Oauth token endpoint authentication method
-    OIDC_TOKEN_ENDPOINT_AUTH_METHOD: "client_secret_basic"
-    # Wether to verify the SSL connection to OIDC Provider
-    OIDC_SSL_VERIFY: "no"
-    # TTL of accesstoken in seconds
-    OIDC_TOKEN_EXPIRY_TIME: "7200"
-    # Whether to renew the access token once it has expired
-    OIDC_RENEW_ACCESS_TOKEN: "true"
-    # Name of the actual service behind this auth sidcar within the same pod
-    TARGET_HOST: "http://127.0.0.1"
-    # Port of the actual service behind this auth sidcar within the same pod
-    TARGET_PORT: "8080"
-    # Log level of the nginx
-    LOG_LEVEL: "info"
-    # Authentication Type (UI/BACKEND)
-    AUTH_TYPE: "UI"
+    config:
+      # Auto Config URL for OIDC Provider
+      discoveryUrl: ""
+      # Redirect URL
+      redirectUrl: "https://127.0.0.1:8443/callback"
+      # OAuth Scopes
+      scope: "openid"
+      # Oauth token endpoint authentication method
+      tokenEndpointAuthMethod: "client_secret_basic"
+      # Wether to verify the SSL connection to OIDC Provider
+      sslVerify: "no"
+      # TTL of accesstoken in seconds
+      tokenExpiryTime: "7200"
+      # Whether to renew the access token once it has expired
+      renewAccessToken: "true"
+      # Name of the actual service behind this auth sidcar within the same pod
+      targetHost: "http://127.0.0.1"
+      # Port of the actual service behind this auth sidcar within the same pod
+      targetPort: "8080"
+      # Log level of the nginx
+      logLevel: "info"
+      # Authentication Type (UI/BACKEND)
+      authType: "UI"
+    secret:
+      # All necessary sidecar credentials as one object
+      key:
   cache:
     # Set Session Cache Storage (cookie/redis)
-    SESSION_STORAGE: "cookie"
+    type: "cookie"
     # Session Storage Hostname/IP Address, reachable service inside Kubernetes
-    SESSION_STORAGE_HOST: ""
+    host: ""
     # Port from Session Storage Server/Service
-    SESSION_STORAGE_PORT: ""
+    port: ""
     # Time To Live for the Redis Key Expire
-    SESSION_STORAGE_CACHE_TTL: "7200"
+    ttl: "7200"
 
 project:
   includeAwsCredentials: false
@@ -102,8 +102,9 @@ ingress:
   ext:
     enabled: false
     annotations:
-      nginx.ingress.kubernetes.io/ssl-redirect: "false"
-      nginx.ingress.kubernetes.io/ssl-ciphers: "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA"
+      ssl:
+        redirect: "false"
+        ciphers: "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA"
     class: ingress-extranet
     path: /
     host:
@@ -111,8 +112,9 @@ ingress:
   int:
     enabled: false
     annotations:
-      nginx.ingress.kubernetes.io/ssl-redirect: "false"
-      nginx.ingress.kubernetes.io/ssl-ciphers: "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA"
+        ssl:
+          redirect: "false"
+          ciphers: "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA"
     class: ingress-intranet
     path: /
     host:
@@ -132,12 +134,11 @@ service:
 #-------------------------------#
 # secret.yaml value section     #
 #-------------------------------#
-secret:
-    aws_accesskey:
-    aws_secretkey:
 
 externalSecret:
-  SERVICE_CREDENTIALS_KEY:
+  service:
+    credentials:
+      key:
 
 #-------------------------------------#
 # tls.yaml/ingress.yaml value section #

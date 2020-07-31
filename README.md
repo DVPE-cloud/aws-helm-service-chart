@@ -36,7 +36,7 @@ helm install my-release <HELM_CHART_REPO_REF>\
     --set=deployment.spec.image.repository=<DOCKER_REPOSITORY_URL> \
     --set=deployment.spec.serviceAccountName=<SERVICE_ACCOUNT_NAME> \
     --set=deployment.spec.containers.readinessProbe.httpGet.path=<READINESS_ENDPOINT_URL> \
-    --set=externalSecret.SERVICE_CREDENTIALS_KEY=<SERVICE_CREDENTIALS_KEY>
+    --set=externalSecret.service.credentials.key=<SERVICE_CREDENTIALS_KEY>
 ```
 
 ### Include internal/external Ingress
@@ -60,12 +60,12 @@ If you want to add oauth2 as sidecar in front of your service, append the follow
 
 ```bash
     --set=oauth2.enabled=true \
-    --set=oauth2.secret.SIDECAR_CREDENTIALS_KEY=<SIDECAR_CREDENTIALS_KEY> \
-    --set=oauth2.config.OIDC_DISCOVERY_URL=<OIDC_DISCOVERY_URL> \
-    --set=oauth2.config.OIDC_REDIRECT_URI=<OIDC_REDIRECT_URI> \
-    --set=oauth2.config.OIDC_SSL_VERIFY=<OIDC_SSL_VERIFY> \
-    --set=oauth2.config.AUTH_TYPE=<AUTH_TYPE> \
-    --set=oauth2.config.LOG_LEVEL=<LOG_LEVEL> \
+    --set=oauth2.sidecar.secret.key=<SIDECAR_CREDENTIALS_KEY> \
+    --set=oauth2.sidecar.config.discoveryUrl=<OIDC_DISCOVERY_URL> \
+    --set=oauth2.sidecar.config.redirectUrl=<OIDC_REDIRECT_URI> \
+    --set=oauth2.sidecar.config.sslVerify=<OIDC_SSL_VERIFY> \
+    --set=oauth2.sidecar.config.authType=<AUTH_TYPE> \
+    --set=oauth2.sidecar.config.logLevel=<LOG_LEVEL> \
     --set=oauth2.sidecar.image.repository=<SIDECAR_REPOSITORY> \
     --set=oauth2.sidecar.image.name=<SIDECAR_IMAGE} \
     --set=oauth2.sidecar.image.tag=<SIDECAR_TAG>
@@ -79,9 +79,9 @@ If you want to use redis as session-cache for the auth-sidecar container, append
 You also need to configure and enable oauth2 parameters (see Include Oauth2 Authentication).
 
 ```bash
-    --set=oauth2.cache.SESSION_STORAGE=<SESSION_STORAGE> \
-    --set=oauth2.cache.SESSION_STORAGE_HOST=<SESSION_STORAGE_HOST> \
-    --set=oauth2.cache.SESSION_STORAGE_PORT=<SESSION_STORAGE_PORT> \
+    --set=oauth2.cache.type=<SESSION_STORAGE> \
+    --set=oauth2.cache.host=<SESSION_STORAGE_HOST> \
+    --set=oauth2.cache.port=<SESSION_STORAGE_PORT> \
 ```
 
 ### Include DataDog Monitoring
@@ -179,9 +179,7 @@ The chart can be executed with following parameters:
 | ingress.int.host              | A valid DNS name for exposing an ingress route for private access. `ingress.int.enabled` must be set to `true`| `my-service.<AWS_REGION>.cloud.bmw` |
 | tls.cert.int.secret.value     | Reference to AWS Secret Manager which includes a `tls.crt` as cert and a `tls.key` as key. `NOTE`: This is only relevant if your K8S dev namespace is labeled `private`. It must be base64 pre-encrypted. | `tls.cert.int.secret` |
 | project.includeAwsCredentials | If AWS credentials need to be provided for using other AWS services internally set this flag to `true`. When set to `true` then `secret.aws_accesskey` and `secret.aws_secretkey` need to be provided as well. | `true` if AWS credentials should be included, `false` is the default.|
-| secret.aws_accesskey          | It might be necessary to additionally pass the AWS Access Key when using internal AWS services from within your application. Must be base64 pre-encrypted |  AWS Access Key generated for your user  |
-| secret.aws_secretkey          | It might be necessary to additionally pass the AWS Secret Key when using internal AWS services from within your application. Must be base64 pre-encrypted |  AWS Secret Key generated for your user  |
-| externalSecret.SERVICE_CREDENTIALS_KEY | All sensitive data needed by your application should be stored in a AWS Secret Manager Object. Each key should be named like your needed environment variable | `service.permission-checker` |
+| externalSecret.service.credentials.key | All sensitive data needed by your application should be stored in a AWS Secret Manager Object. Each key should be named like your needed environment variable | `service.permission-checker` |
 | deployment.spec.resources.limits.cpu | Total amount of CPU time that a container can use every 100 ms. See [Managing Compute Resources for Containers](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) for a detailed description on resource usage.| `200m` |
 | deployment.spec.resources.limits.memory | The memory limit for a Pod. See [Managing Compute Resources for Containers](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) for a detailed description on resource usage. | `235M` |
 | deployment.spec.resources.requests.cpu | Fractional amount of CPU allowed for a Pod. See [Managing Compute Resources for Containers](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) for a detailed description on resource usage.| `150m` |
@@ -197,24 +195,35 @@ The chart can be executed with following parameters:
 | oauth2.sidecar.image.tag | Auth Sidecar Container Image Tag | `v1.1.0` |
 | oauth2.sidecar.image.pullPolicy | Kubernetes Image PullPolicy | `Always` |
 | oauth2.sidecar.servicePort | On which port the service runs | `8443` |
-| oauth2.secret.SIDECAR_CREDENTIALS_KEY | Reference to a AWS Secret Manager Object with all relevant sidecar credentials. Should contain at least ClientId, Client Secret, Session Secret and Cache Auth Password | Example: `service.permission-checker.auth-sidecar` |
-| oauth2.config.OIDC_DISCOVERY_URL | URL from IDP Discovery Service | `https://idp.domain/auth/discovery` |
-| oauth2.config.OIDC_REDIRECT_URI | Callback URL | `https://127.0.0.1:8443/callback` |
-| oauth2.config.OIDC_SCOPE | Oauth2 Scope | `openid` |
-| oauth2.config.OIDC_TOKEN_ENDPOINT_AUTH_METHOD | Oauth2 token endpoint authentication method | `client_secret_basic` |
-| oauth2.config.OIDC_SSL_VERIFY | Enable or disable ssl certificat validation | `yes` |
-| oauth2.config.OIDC_TOKEN_EXPIRY_TIME | TTL of accesstoken in seconds | `7200` |
-| oauth2.config.OIDC_RENEW_ACCESS_TOKEN | Whether to renew the access token once it has expired | `true` |
-| oauth2.config.TARGET_HOST | URL of the actual service behind this auth sidcar within the same pod | `http://127.0.0.1` |
-| oauth2.config.TARGET_PORT | Port of the actual service behind this auth sidcar within the same pod | `8080` |
-| oauth2.config.LOG_LEVEL | Log level of the auth-sidecar reverse Proxy | `info` |
-| oauth2.config.AUTH_TYPE | Client Authentication Type (UI/BACKEND) | `UI` |
-| oauth2.cache.SESSION_STORAGE | Name of the storage system, currently only cookie and redis are available, default is cookie | `redis` |
-| oauth2.cache.SESSION_STORAGE_HOST | Hostname (FQDN) or IP Address of the session cache server/cluster | `127.0.0.1` |
-| oauth2.cache.SESSION_STORAGE_PORT | Port Number | `6379` |
-| oauth2.cache.SESSION_STORAGE_CACHE_TTL | Redis Expire TTL Value in seconds (default 2h) | `7200` |
+| oauth2.sidecar.secret.key | Reference to a AWS Secret Manager Object with all relevant sidecar credentials. Should contain at least ClientId, Client Secret, Session Secret and Cache Auth Password | Example: `service.permission-checker.auth-sidecar` |
+| oauth2.sidecar.config.discoveryUrl | URL from IDP Discovery Service | `https://idp.domain/auth/discovery` |
+| oauth2.sidecar.config.redirectUrl | Callback URL | `https://127.0.0.1:8443/callback` |
+| oauth2.sidecar.config.scope | Oauth2 Scope | `openid` |
+| oauth2.sidecar.config.tokenEndpointAuthMethod | Oauth2 token endpoint authentication method | `client_secret_basic` |
+| oauth2.sidecar.config.sslVerify | Enable or disable ssl certificat validation | `no` |
+| oauth2.sidecar.config.tokenExpiryTime | TTL of accesstoken in seconds | `7200` |
+| oauth2.sidecar.config.renewAccessToken | Whether to renew the access token once it has expired | `true` |
+| oauth2.sidecar.config.targetHost | URL of the actual service behind this auth sidcar within the same pod | `http://127.0.0.1` |
+| oauth2.sidecar.config.targetPort | Port of the actual service behind this auth sidcar within the same pod | `8080` |
+| oauth2.sidecar.config.logLevel | Log level of the auth-sidecar reverse Proxy | `info` |
+| oauth2.sidecar.config.authType | Client Authentication Type (UI/BACKEND) | `UI` |
+| oauth2.cache.type | Name of the storage system, currently only cookie and redis are available | `cookie` |
+| oauth2.cache.host | Hostname (FQDN) or IP Address of the session cache server/cluster | `127.0.0.1` |
+| oauth2.cache.port | Port Number | `6379` |
+| oauth2.cache.ttl | Redis Expire TTL Value in seconds (default 2h) | `7200` |
 | datadog.enabled | `true` if DataDog annotations should be used, `false` otherwise | `false` |
 | datadog.source.service| The name of the DataDog source the service should be instrumented with. | `java` |
+
+## Secrets 
+Store sensitive data is always a big problem. This project uses the approach of [External Secrets](https://github.com/godaddy/kubernetes-external-secrets).
+It allows you to store all your credentials in an external secret management e.g. AWS Secret Manager. 
+This solution gives your project the ability to store your credentials encrypted and provision them as K8s secrets. 
+During the deployment all secrets will be injected as environment variables to each container.
+
+`Note:` All K8s secrets are only base64 encrypted. This solution only solves the problem to provision secrets to k8s. 
+To increase your security level you should encrypt your secrets in the `etcd` as well. Example for [EKS](https://aws.amazon.com/de/blogs/containers/using-eks-encryption-provider-support-for-defense-in-depth/).
+Also uses RBAC to restrict access to secrets in a namespace or pod.
+
 
 ## Testing Horizontal Pod Autoscaling
 In order to test the Pod Autoscaler with your deployed service do the following:
