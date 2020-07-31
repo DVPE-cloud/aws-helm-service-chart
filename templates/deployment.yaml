@@ -37,114 +37,99 @@ spec:
         - name: {{ $serviceName }}-auth-sidecar
           image: "{{ .Values.oauth2.sidecar.image.repository }}/{{ .Values.oauth2.sidecar.image.name }}:{{ .Values.oauth2.sidecar.image.tag }}"
           imagePullPolicy: {{ .Values.oauth2.sidecar.image.pullPolicy }}
+          envFrom:
+          - secretRef:
+              name: {{ $serviceName }}-auth-sidecar
           env:
             - name: "OIDC_DISCOVERY_URL"
               valueFrom:
                 configMapKeyRef:
                   name: {{ $serviceName }}-auth-sidecar
-                  key: OIDC_DISCOVERY_URL
+                  key: discoveryUrl
 
             - name: "OIDC_REDIRECT_URI"
               valueFrom:
                 configMapKeyRef:
                   name: {{ $serviceName }}-auth-sidecar
-                  key: OIDC_REDIRECT_URI
+                  key: redirectUrl
 
             - name: "OIDC_SCOPE"
               valueFrom:
                 configMapKeyRef:
                   name: {{ $serviceName }}-auth-sidecar
-                  key: OIDC_SCOPE
-
-            - name: "OIDC_CLIENT_ID"
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $serviceName }}-auth-sidecar
-                  key: OIDC_CLIENT_ID
+                  key: scope
 
             - name: "OIDC_TOKEN_ENDPOINT_AUTH_METHOD"
               valueFrom:
                 configMapKeyRef:
                   name: {{ $serviceName }}-auth-sidecar
-                  key: OIDC_TOKEN_ENDPOINT_AUTH_METHOD
+                  key: tokenEndpointAuthMethod
 
             - name: "OIDC_SSL_VERIFY"
               valueFrom:
                 configMapKeyRef:
                   name: {{ $serviceName }}-auth-sidecar
-                  key: OIDC_SSL_VERIFY
+                  key: sslVerify
 
             - name: "OIDC_TOKEN_EXPIRY_TIME"
               valueFrom:
                 configMapKeyRef:
                   name: {{ $serviceName }}-auth-sidecar
-                  key: OIDC_TOKEN_EXPIRY_TIME
+                  key: tokenExpiryTime
 
             - name: "OIDC_RENEW_ACCESS_TOKEN"
               valueFrom:
                 configMapKeyRef:
                   name: {{ $serviceName }}-auth-sidecar
-                  key: OIDC_RENEW_ACCESS_TOKEN
+                  key: renewAccessToken
 
             - name: "TARGET_HOST"
               valueFrom:
                 configMapKeyRef:
                   name: {{ $serviceName }}-auth-sidecar
-                  key: TARGET_HOST
+                  key: targetHost
 
             - name: "TARGET_PORT"
               valueFrom:
                 configMapKeyRef:
                   name: {{ $serviceName }}-auth-sidecar
-                  key: TARGET_PORT
+                  key: targetPort
 
             - name: "LOG_LEVEL"
               valueFrom:
                 configMapKeyRef:
                   name: {{ $serviceName }}-auth-sidecar
-                  key: LOG_LEVEL
+                  key: logLevel
 
             - name: "AUTH_TYPE"
               valueFrom:
                 configMapKeyRef:
                   name: {{ $serviceName }}-auth-sidecar
-                  key: AUTH_TYPE
+                  key: authType
 
             - name: "SESSION_STORAGE"
               valueFrom:
                 configMapKeyRef:
                   name: {{ $serviceName }}-auth-sidecar
-                  key: SESSION_STORAGE
+                  key: type
 
             - name: "SESSION_STORAGE_HOST"
               valueFrom:
                 configMapKeyRef:
                   name: {{ $serviceName }}-auth-sidecar
-                  key: SESSION_STORAGE_HOST
+                  key: host
 
             - name: "SESSION_STORAGE_PORT"
               valueFrom:
                 configMapKeyRef:
                   name: {{ $serviceName }}-auth-sidecar
-                  key: SESSION_STORAGE_PORT
-
-            - name: "SESSION_STORAGE_PASSWORD"
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $serviceName }}-auth-sidecar
-                  key: SESSION_STORAGE_PASSWORD
+                  key: port
 
             - name: "SESSION_STORAGE_CACHE_TTL"
               valueFrom:
                 configMapKeyRef:
                   name: {{ $serviceName }}-auth-sidecar
-                  key: SESSION_STORAGE_CACHE_TTL
-
-            - name: "SESSION_SECRET"
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $serviceName }}-auth-sidecar
-                  key: SESSION_SECRET
+                  key: ttl
 
             {{- if .Values.datadog.enabled }}
             - name: "ENABLE_DATADOG"
@@ -181,18 +166,6 @@ spec:
           image: {{ include "image.url" . }}
           imagePullPolicy: {{ .Values.deployment.spec.image.pullPolicy }}
           env:
-            {{- if .Values.project.includeAwsCredentials }}
-            - name: "AWS_ACCESS_KEY"
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $serviceName }}-secret
-                  key: aws.accesskey
-            - name: "AWS_SECRET_KEY"
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $serviceName }}-secret
-                  key: aws.secretkey
-            {{- end}}
             {{- if .Values.datadog.enabled }}
             - name: "ENABLE_DATADOG"
               value: {{ quote .Values.datadog.enabled }}
@@ -221,6 +194,9 @@ spec:
                   key: {{$key}}
             {{- end}}
             {{- end}}
+          envFrom:
+            - secretRef:
+                name: {{ $serviceName }}-service-secrets
           readinessProbe:
             httpGet:
               path: {{ .Values.deployment.spec.containers.readinessProbe.httpGet.path }}
