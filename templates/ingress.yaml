@@ -14,8 +14,8 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: {{ .Values.ingress.ext.class | quote }}
     cert-manager.io/issuer: {{ .Values.tls.issuer.name | quote }}
-    nginx.ingress.kubernetes.io/ssl-redirect: {{ .Values.ingress.ext.annotations.ssl.redirect }}
-    nginx.ingress.kubernetes.io/ssl-ciphers: {{ .Values.ingress.ext.annotations.ssl.ciphers }}
+    nginx.ingress.kubernetes.io/ssl-redirect: {{ .Values.ingress.ext.annotations.ssl.redirect | quote }}
+    nginx.ingress.kubernetes.io/ssl-ciphers: {{ .Values.ingress.ext.annotations.ssl.ciphers | quote }}
 spec:
   tls:
     - hosts:
@@ -40,8 +40,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     kubernetes.io/ingress.class: {{ .Values.ingress.int.class | quote }}
-    nginx.ingress.kubernetes.io/ssl-redirect: {{ .Values.ingress.int.annotations.ssl.redirect }}
-    nginx.ingress.kubernetes.io/ssl-ciphers: {{ .Values.ingress.int.annotations.ssl.ciphers }}
+    nginx.ingress.kubernetes.io/ssl-redirect: {{ .Values.ingress.int.annotations.ssl.redirect | quote }}
+    nginx.ingress.kubernetes.io/ssl-ciphers: {{ .Values.ingress.int.annotations.ssl.ciphers | quote }}
 spec:
   tls:
     - hosts:
