@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.1] - 2020-08-24
+
+### Changed
+
+- Fix missing quotes in Ingress Annotations 
 
 ## [1.10.0] - 2020-07-31
 
@@ -46,5 +51,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.9.3]: https://github.com/DVPE-cloud/aws-helm-service-chart/tree/aws-helm-service-chart-1.9.3
 [1.9.4]: https://github.com/DVPE-cloud/aws-helm-service-chart/tree/aws-helm-service-chart-1.9.4
 [1.9.5]: https://github.com/DVPE-cloud/aws-helm-service-chart/tree/aws-helm-service-chart-1.9.5
-[1.9.10]: https://github.com/DVPE-cloud/aws-helm-service-chart/tree/aws-helm-service-chart-1.9.10
+[1.10.0]: https://github.com/DVPE-cloud/aws-helm-service-chart/tree/aws-helm-service-chart-1.10.0
+[1.10.1]: https://github.com/DVPE-cloud/aws-helm-service-chart/tree/aws-helm-service-chart-1.10.1
 
