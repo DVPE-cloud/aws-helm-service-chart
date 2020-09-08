@@ -6,7 +6,7 @@ kind: ConfigMap
 metadata:
   name: {{ $serviceName }}-auth-sidecar
 data:
-  {{- range $key, $value := .Values.oauth2.config }}
+  {{- range $key, $value := .Values.oauth2.sidecar.config }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
   {{- range $key, $value := .Values.oauth2.cache }}
