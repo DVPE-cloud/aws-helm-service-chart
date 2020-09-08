@@ -28,7 +28,7 @@ spec:
         ad.datadoghq.com/{{ $serviceName }}-auth-sidecar.tags: '{"team": "DVPE"}'
         {{- end }}
       {{- end }}
-      helm/deployment-timestamp: {{ now | unixEpoch }}
+        helm/deployment-timestamp: "{{ now | unixEpoch }}"
     spec:
       imagePullSecrets:
         - name: aws-ecr-secret
