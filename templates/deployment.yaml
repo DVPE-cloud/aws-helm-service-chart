@@ -15,8 +15,8 @@ spec:
     metadata:
       labels:
         app: {{ $serviceName }}
-      {{- if .Values.datadog.enabled }}
       annotations:
+      {{- if .Values.datadog.enabled }}
         ad.datadoghq.com/{{ $serviceName }}.check_names: '["{{ $serviceName }}"]'
         ad.datadoghq.com/{{ $serviceName }}.init_configs: '[{}]'
         ad.datadoghq.com/{{ $serviceName }}.logs: '[{"source":"{{ .Values.datadog.source.service }}", "service":"{{ $serviceName }}" }]'
@@ -28,6 +28,7 @@ spec:
         ad.datadoghq.com/{{ $serviceName }}-auth-sidecar.tags: '{"team": "DVPE"}'
         {{- end }}
       {{- end }}
+      helm/deployment-timestamp: {{ now | unixEpoch }}
     spec:
       imagePullSecrets:
         - name: aws-ecr-secret
