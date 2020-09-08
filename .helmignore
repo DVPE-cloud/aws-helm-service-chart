@@ -20,3 +20,7 @@
 .idea/
 *.tmproj
 .vscode/
+/CHANGELOG.md
+/README.md
+/.cr-release-packages/
+/docs/
