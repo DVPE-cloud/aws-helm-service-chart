@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.2] - 2020-09-09
+
+### Changed
+
+- Fix not working rolling update with helm upgrade. Add timestamp annotation in deployment config
+- Update .helmignore to reduce package size
+
 ## [1.10.1] - 2020-08-24
 
 ### Changed
@@ -53,4 +60,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.9.5]: https://github.com/DVPE-cloud/aws-helm-service-chart/tree/aws-helm-service-chart-1.9.5
 [1.10.0]: https://github.com/DVPE-cloud/aws-helm-service-chart/tree/aws-helm-service-chart-1.10.0
 [1.10.1]: https://github.com/DVPE-cloud/aws-helm-service-chart/tree/aws-helm-service-chart-1.10.1
+[1.10.2]: https://github.com/DVPE-cloud/aws-helm-service-chart/tree/aws-helm-service-chart-1.10.2
 
