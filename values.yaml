@@ -119,6 +119,8 @@ ingress:
     path: /
     host:
     servicePort: 8080
+  extendUploadSize: false
+  extendedTimeoutInMiliseconds: 900000
 
 #-------------------------------#
 # service.yaml value section    #

@@ -12,6 +12,12 @@ metadata:
   name: {{ $serviceName }}-ing-ext
   namespace: {{ .Release.Namespace }}
   annotations:
+    {{- if .Values.ingress.extendUploadSize }}
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: {{ .Values.ingress.extendedTimeoutInMiliseconds | quote }}
+    nginx.ingress.kubernetes.io/proxy-send-timeout: {{ .Values.ingress.extendedTimeoutInMiliseconds | quote }}
+    nginx.ingress.kubernetes.io/proxy-read-timeout: {{ .Values.ingress.extendedTimeoutInMiliseconds | quote }}
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    {{- end}}
     kubernetes.io/ingress.class: {{ .Values.ingress.ext.class | quote }}
     cert-manager.io/issuer: {{ .Values.tls.issuer.name | quote }}
     nginx.ingress.kubernetes.io/ssl-redirect: {{ .Values.ingress.ext.annotations.ssl.redirect | quote }}
@@ -39,6 +45,12 @@ metadata:
   name: {{ $serviceName }}-ing-int
   namespace: {{ .Release.Namespace }}
   annotations:
+    {{- if .Values.ingress.extendUploadSize }}
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: {{ .Values.ingress.extendedTimeoutInMiliseconds | quote }}
+    nginx.ingress.kubernetes.io/proxy-send-timeout: {{ .Values.ingress.extendedTimeoutInMiliseconds | quote }}
+    nginx.ingress.kubernetes.io/proxy-read-timeout: {{ .Values.ingress.extendedTimeoutInMiliseconds | quote }}
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    {{- end}}
     kubernetes.io/ingress.class: {{ .Values.ingress.int.class | quote }}
     nginx.ingress.kubernetes.io/ssl-redirect: {{ .Values.ingress.int.annotations.ssl.redirect | quote }}
     nginx.ingress.kubernetes.io/ssl-ciphers: {{ .Values.ingress.int.annotations.ssl.ciphers | quote }}
