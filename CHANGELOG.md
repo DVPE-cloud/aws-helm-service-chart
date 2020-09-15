@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix not working rolling update with helm upgrade. Add timestamp annotation in deployment config
 - Update .helmignore to reduce package size
 
+## [1.10.3] - 2020-15-09
+
+### Changed
+
+- Add option of extending maximum upload size
+
 ## [1.10.1] - 2020-08-24
 
 ### Changed
