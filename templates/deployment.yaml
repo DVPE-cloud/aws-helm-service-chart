@@ -132,6 +132,18 @@ spec:
                   name: {{ $serviceName }}-auth-sidecar
                   key: ttl
 
+            - name: "CORS_ALLOWED_ORIGINS"
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $serviceName }}-auth-sidecar
+                  key: corsAllowedOrigins
+
+            - name: "SESSION_COOKIE_DOMAIN"
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $serviceName }}-auth-sidecar
+                  key: sessionCookieDomain
+
             {{- if .Values.datadog.enabled }}
             - name: "ENABLE_DATADOG"
               value: {{ quote .Values.datadog.enabled }}

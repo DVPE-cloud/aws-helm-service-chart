@@ -15,7 +15,7 @@ oauth2:
     servicePort: 8443
     config:
       # Auto Config URL for OIDC Provider
-      discoveryUrl: ""
+      discoveryUrl: "https://auth-i.bmwgroup.net/auth/oauth2/realms/root/realms/intranetb2x/.well-known/openid-configuration"
       # Redirect URL
       redirectUrl: "https://127.0.0.1:8443/callback"
       # OAuth Scopes
@@ -35,7 +35,11 @@ oauth2:
       # Log level of the nginx
       logLevel: "info"
       # Authentication Type (UI/BACKEND)
-      authType: "UI"
+      authType: ""
+      # Cors Allowed Origin for Options request in /api location. URLs need to match with origins
+      corsAllowedOrigins: ""
+      # Specifies the Domain for the Session Cookie
+      sessionCookieDomain: ".eu-west-1.aws.cloud.bmw"
     secret:
       # All necessary sidecar credentials as one object
       key:
@@ -44,8 +48,8 @@ oauth2:
     type: "cookie"
     # Session Storage Hostname/IP Address, reachable service inside Kubernetes
     host: ""
-    # Port from Session Storage Server/Service
-    port: ""
+    # Port from Session Storage Server/Service - Default redis port
+    port: "6379"
     # Time To Live for the Redis Key Expire
     ttl: "7200"
 
@@ -152,7 +156,7 @@ tls:
   cert:
     ext:
       secret:
-        name: service-cert-tls
+        name: service-c ert-tls
     int:
       secret:
         name: internal-wildcard-tls-secret
