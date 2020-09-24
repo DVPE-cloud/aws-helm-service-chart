@@ -15,7 +15,7 @@ oauth2:
     servicePort: 8443
     config:
       # Auto Config URL for OIDC Provider
-      discoveryUrl: "https://auth-i.bmwgroup.net/auth/oauth2/realms/root/realms/intranetb2x/.well-known/openid-configuration"
+      discoveryUrl: ""
       # Redirect URL
       redirectUrl: "https://127.0.0.1:8443/callback"
       # OAuth Scopes
@@ -34,12 +34,10 @@ oauth2:
       targetPort: "8080"
       # Log level of the nginx
       logLevel: "info"
-      # Authentication Type (UI/BACKEND)
-      authType: ""
       # Cors Allowed Origin for Options request in /api location. URLs need to match with origins
       corsAllowedOrigins: ""
       # Specifies the Domain for the Session Cookie
-      sessionCookieDomain: ".eu-west-1.aws.cloud.bmw"
+      sessionCookieDomain: ""
     secret:
       # All necessary sidecar credentials as one object
       key:

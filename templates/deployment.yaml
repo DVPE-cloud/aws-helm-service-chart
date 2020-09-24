@@ -102,12 +102,6 @@ spec:
                   name: {{ $serviceName }}-auth-sidecar
                   key: logLevel
 
-            - name: "AUTH_TYPE"
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ $serviceName }}-auth-sidecar
-                  key: authType
-
             - name: "SESSION_STORAGE"
               valueFrom:
                 configMapKeyRef:

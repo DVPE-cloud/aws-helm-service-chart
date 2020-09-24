@@ -64,7 +64,6 @@ If you want to add oauth2 as sidecar in front of your service, append the follow
     --set=oauth2.sidecar.config.discoveryUrl=<OIDC_DISCOVERY_URL> \
     --set=oauth2.sidecar.config.redirectUrl=<OIDC_REDIRECT_URI> \
     --set=oauth2.sidecar.config.sslVerify=<OIDC_SSL_VERIFY> \
-    --set=oauth2.sidecar.config.authType=<AUTH_TYPE> \
     --set=oauth2.sidecar.config.logLevel=<LOG_LEVEL> \
     --set=oauth2.sidecar.image.repository=<SIDECAR_REPOSITORY> \
     --set=oauth2.sidecar.image.name=<SIDECAR_IMAGE} \
@@ -107,7 +106,6 @@ Finally if you like to add DataDog Monitoring for the included service append th
 - `OIDC_DISCOVERY_URL` = URL from IDP Authentication
 - `OIDC_REDIRECT_URI` = Redirect URL
 - `OIDC_SSL_VERIFY`= Enable or disable SSL Certificate Verification
-- `AUTH_TYPE` = Authentication Mode (UI or BACKEND)
 - `LOG_LEVEL` = Log Level (Default: info)
 - `SIDECAR_REPOSITORY` = Repostory of Oauth2 Container Image
 - `SIDECAR_IMAGE` = Name of Oauth2 Container Image
@@ -116,7 +114,8 @@ Finally if you like to add DataDog Monitoring for the included service append th
 - `SESSION_STORAGE_HOST` = Cache System Hostname/IP Address
 - `SESSION_STORAGE_PORT` = Cache System Port Number
 - `SESSION_STORAGE_CACHE_TTL` = Redis Key Expire TTL
-
+- `CORS_ALLOWED_ORIGINS` = Cors Allowed Origin for Options request in /api location. URLs need to match with origins
+- `SESSION_COOKIE_DOMAIN` = Specifies the Domain for the Session Cookie created by Sidecar
 
 See the [configuration](#Configuration) section for a detailed overview of parameters.
 
@@ -177,6 +176,8 @@ The chart can be executed with following parameters:
 | ingress.ext.host              | A valid DNS name for exposing an ingress route for public access. `ingress.ext.enabled` must be set to `true`| `my-service.<AWS_REGION>.bmw.cloud` |
 | ingress.int.enabled           | Set to `true` if a private (intranet facing) ingress controller has been configured in your cluster. Default is set to `false` | `false` |
 | ingress.int.host              | A valid DNS name for exposing an ingress route for private access. `ingress.int.enabled` must be set to `true`| `my-service.<AWS_REGION>.cloud.bmw` |
+| ingress.extendUploadSize      | Allows to extend the upload size of the ingress. | `false` |
+| ingress.extendedTimeoutInMiliseconds | Extend the ingress nginx connection timeout. | `900000` |
 | tls.cert.int.secret.value     | Reference to AWS Secret Manager which includes a `tls.crt` as cert and a `tls.key` as key. `NOTE`: This is only relevant if your K8S dev namespace is labeled `private`. It must be base64 pre-encrypted. | `tls.cert.int.secret` |
 | project.includeAwsCredentials | If AWS credentials need to be provided for using other AWS services internally set this flag to `true`. When set to `true` then `secret.aws_accesskey` and `secret.aws_secretkey` need to be provided as well. | `true` if AWS credentials should be included, `false` is the default.|
 | externalSecret.service.credentials.key | All sensitive data needed by your application should be stored in a AWS Secret Manager Object. Each key should be named like your needed environment variable | `service.permission-checker` |
@@ -207,6 +208,8 @@ The chart can be executed with following parameters:
 | oauth2.sidecar.config.targetPort | Port of the actual service behind this auth sidcar within the same pod | `8080` |
 | oauth2.sidecar.config.logLevel | Log level of the auth-sidecar reverse Proxy | `info` |
 | oauth2.sidecar.config.authType | Client Authentication Type (UI/BACKEND) | `UI` |
+| oauth2.sidecar.config.corsAllowedOrigins | Cors Allowed Origin for Options request in /api location. URLs need to match with origins | `` |
+| oauth2.sidecar.config.sessionCookieDomain | Specifies the Domain for the Session Cookie. If not specified it's the domain who set the cookie | `` |
 | oauth2.cache.type | Name of the storage system, currently only cookie and redis are available | `cookie` |
 | oauth2.cache.host | Hostname (FQDN) or IP Address of the session cache server/cluster | `127.0.0.1` |
 | oauth2.cache.port | Port Number | `6379` |
