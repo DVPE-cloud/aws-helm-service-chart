@@ -34,8 +34,10 @@ oauth2:
       targetPort: "8080"
       # Log level of the nginx
       logLevel: "info"
-      # Authentication Type (UI/BACKEND)
-      authType: "UI"
+      # Cors Allowed Origin for Options request in /api location. URLs need to match with origins
+      corsAllowedOrigins: ""
+      # Specifies the Domain for the Session Cookie
+      sessionCookieDomain: ""
     secret:
       # All necessary sidecar credentials as one object
       key:
@@ -44,8 +46,8 @@ oauth2:
     type: "cookie"
     # Session Storage Hostname/IP Address, reachable service inside Kubernetes
     host: ""
-    # Port from Session Storage Server/Service
-    port: ""
+    # Port from Session Storage Server/Service - Default redis port
+    port: "6379"
     # Time To Live for the Redis Key Expire
     ttl: "7200"
 
