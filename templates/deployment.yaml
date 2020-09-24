@@ -102,6 +102,12 @@ spec:
                   name: {{ $serviceName }}-auth-sidecar
                   key: logLevel
 
+            - name: "AUTH_TYPE"
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $serviceName }}-auth-sidecar
+                  key: authType
+
             - name: "SESSION_STORAGE"
               valueFrom:
                 configMapKeyRef:
@@ -133,18 +139,21 @@ spec:
                   key: corsAllowedOrigins
 
             - name: "SESSION_COOKIE_DOMAIN"
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ $serviceName }}-auth-sidecar
-                  key: sessionCookieDomain
+              {{- if .Values.ingress.int.enabled }}
+              value: {{ .Values.ingress.int.host | trimPrefix $serviceName }}
+              {{- else if .Values.ingress.ext.enabled }}
+              value: {{ .Values.ingress.ext.host | trimPrefix $serviceName }}
+              {{- end -}}
 
             {{- if .Values.datadog.enabled }}
             - name: "ENABLE_DATADOG"
               value: {{ quote .Values.datadog.enabled }}
+
             - name: "DD_AGENT_HOST"
               valueFrom:
                 fieldRef:
                   fieldPath: status.hostIP
+
             - name: "DD_SERVICE"
               value: {{ $serviceName }}-auth-sidecar
             {{- end}}
