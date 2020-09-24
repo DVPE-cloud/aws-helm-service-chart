@@ -156,7 +156,7 @@ tls:
   cert:
     ext:
       secret:
-        name: service-c ert-tls
+        name: service-cert-tls
     int:
       secret:
         name: internal-wildcard-tls-secret
